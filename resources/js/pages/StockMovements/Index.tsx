@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { canCreate } from '@/lib/permissions';
 
 const movementTypeLabels = {
     purchase: 'Purchase',
@@ -30,6 +31,7 @@ const movementTypeColors = {
 export default function StockMovementsIndex({ movements, products, warehouses, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -59,12 +61,16 @@ export default function StockMovementsIndex({ movements, products, warehouses, f
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button asChild variant="outline">
-                            <Link href="/stock-movements/adjust">Adjust Stock</Link>
-                        </Button>
-                        <Button asChild>
-                            <Link href={route('purchase-orders.create')}>New Purchase Order</Link>
-                        </Button>
+                        {canCreate(userPermissions, 'stock-movements') && (
+                            <Button asChild variant="outline">
+                                <Link href="/stock-movements/adjust">Adjust Stock</Link>
+                            </Button>
+                        )}
+                        {canCreate(userPermissions, 'purchase-orders') && (
+                            <Button asChild>
+                                <Link href={route('purchase-orders.create')}>New Purchase Order</Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,6 +16,15 @@ import {
 } from '@/components/ui/select';
 
 export default function PurchaseOrdersCreate({ suppliers, products }) {
+    const { props } = usePage();
+    const userPermissions = props.auth?.user?.permissions || [];
+
+    useEffect(() => {
+        if (!userPermissions.includes('create-purchase-orders')) {
+            router.visit('/unauthorized');
+        }
+    }, [userPermissions]);
+
     const [items, setItems] = useState([
         { product_id: '', quantity: 1, unit_price: '' }
     ]);

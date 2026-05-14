@@ -1,5 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,15 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 export default function InventoryEdit({ inventory, products, warehouses }) {
+    const { props } = usePage();
+    const userPermissions = props.auth?.user?.permissions || [];
+
+    useEffect(() => {
+        if (!userPermissions.includes('edit-inventory')) {
+            router.visit('/unauthorized');
+        }
+    }, [userPermissions]);
+
     const { data, setData, put, errors, processing } = useForm({
         product_id: inventory.product_id?.toString() || '',
         warehouse_id: inventory.warehouse_id?.toString() || '',

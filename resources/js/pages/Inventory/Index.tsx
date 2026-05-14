@@ -12,10 +12,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 export default function InventoryIndex({ inventories, warehouses, lowStockCount, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -43,12 +45,16 @@ export default function InventoryIndex({ inventories, warehouses, lowStockCount,
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button asChild variant="outline">
-                            <Link href="/stock-movements/adjust">Adjust Stock</Link>
-                        </Button>
-                        <Button asChild>
-                            <Link href={route('inventory.create')}>Add Inventory</Link>
-                        </Button>
+                        {canCreate(userPermissions, 'stock-movements') && (
+                            <Button asChild variant="outline">
+                                <Link href="/stock-movements/adjust">Adjust Stock</Link>
+                            </Button>
+                        )}
+                        {canCreate(userPermissions, 'inventory') && (
+                            <Button asChild>
+                                <Link href={route('inventory.create')}>Add Inventory</Link>
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -179,50 +185,54 @@ export default function InventoryIndex({ inventories, warehouses, lowStockCount,
                                                 </td>
                                                 <td className="py-4 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            asChild
-                                                            size="sm"
-                                                            variant="outline"
-                                                        >
-                                                            <Link
-                                                                href={route(
-                                                                    'inventory.edit',
+                                                        {canEdit(userPermissions, 'inventory') && (
+                                                            <Button
+                                                                asChild
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <Link
+                                                                    href={route(
+                                                                        'inventory.edit',
+                                                                        inventory.id
+                                                                    )}
+                                                                >
+                                                                    Edit
+                                                                </Link>
+                                                            </Button>
+                                                        )}
+                                                        {canDelete(userPermissions, 'inventory') && (
+                                                            <form
+                                                                action={route(
+                                                                    'inventory.destroy',
                                                                     inventory.id
                                                                 )}
+                                                                method="post"
+                                                                className="inline"
                                                             >
-                                                                Edit
-                                                            </Link>
-                                                        </Button>
-                                                        <form
-                                                            action={route(
-                                                                'inventory.destroy',
-                                                                inventory.id
-                                                            )}
-                                                            method="post"
-                                                            className="inline"
-                                                        >
-                                                            <input
-                                                                type="hidden"
-                                                                name="_method"
-                                                                value="delete"
-                                                            />
-                                                            <Button
-                                                                type="submit"
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                onClick={(e) => {
-                                                                    if (
-                                                                        !confirm(
-                                                                            'Are you sure you want to delete this inventory record?'
-                                                                        )
-                                                                    ) {
-                                                                        e.preventDefault();
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Delete
-                                                            </Button>
-                                                        </form>
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="_method"
+                                                                    value="delete"
+                                                                />
+                                                                <Button
+                                                                    type="submit"
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    onClick={(e) => {
+                                                                        if (
+                                                                            !confirm(
+                                                                                'Are you sure you want to delete this inventory record?'
+                                                                            )
+                                                                        ) {
+                                                                            e.preventDefault();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </form>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

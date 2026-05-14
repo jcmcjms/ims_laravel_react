@@ -1,7 +1,7 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import InputError from '@/components/input-error';
@@ -46,6 +46,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function RolesCreate({ permissions }: RolesCreateProps) {
+    const { props } = usePage();
+    const userPermissions = props.auth?.user?.permissions || [];
+
+    useEffect(() => {
+        if (!userPermissions.includes('create-roles')) {
+            router.visit('/unauthorized');
+        }
+    }, [userPermissions]);
+
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
     // Group permissions by their first segment (e.g., "users", "products", etc.)

@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 export default function WarehousesIndex({ warehouses, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
 
     return (
         <AppLayout
@@ -27,9 +29,11 @@ export default function WarehousesIndex({ warehouses, filters }) {
                             Manage your warehouse locations
                         </p>
                     </div>
-                    <Button asChild>
-                        <Link href={route('warehouses.create')}>Add Warehouse</Link>
-                    </Button>
+                    {canCreate(userPermissions, 'warehouses') && (
+                        <Button asChild>
+                            <Link href={route('warehouses.create')}>Add Warehouse</Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
@@ -100,30 +104,34 @@ export default function WarehousesIndex({ warehouses, filters }) {
                                                 </td>
                                                 <td className="py-4 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <Button asChild size="sm" variant="outline">
-                                                            <Link href={route('warehouses.edit', warehouse.id)}>
-                                                                Edit
-                                                            </Link>
-                                                        </Button>
-                                                        <form
-                                                            action={route('warehouses.destroy', warehouse.id)}
-                                                            method="post"
-                                                            className="inline"
-                                                        >
-                                                            <input type="hidden" name="_method" value="delete" />
-                                                            <Button
-                                                                type="submit"
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                onClick={(e) => {
-                                                                    if (!confirm('Are you sure you want to delete this warehouse?')) {
-                                                                        e.preventDefault();
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Delete
+                                                        {canEdit(userPermissions, 'warehouses') && (
+                                                            <Button asChild size="sm" variant="outline">
+                                                                <Link href={route('warehouses.edit', warehouse.id)}>
+                                                                    Edit
+                                                                </Link>
                                                             </Button>
-                                                        </form>
+                                                        )}
+                                                        {canDelete(userPermissions, 'warehouses') && (
+                                                            <form
+                                                                action={route('warehouses.destroy', warehouse.id)}
+                                                                method="post"
+                                                                className="inline"
+                                                            >
+                                                                <input type="hidden" name="_method" value="delete" />
+                                                                <Button
+                                                                    type="submit"
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    onClick={(e) => {
+                                                                        if (!confirm('Are you sure you want to delete this warehouse?')) {
+                                                                            e.preventDefault();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </form>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

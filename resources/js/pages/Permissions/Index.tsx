@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 interface Permission {
     id: number;
@@ -61,6 +62,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function PermissionsIndex({ permissions, filters }: PermissionsIndexProps) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [permissionToDelete, setPermissionToDelete] = useState<Permission | null>(null);
 
@@ -87,12 +89,14 @@ export default function PermissionsIndex({ permissions, filters }: PermissionsIn
                         <h1 className="text-3xl font-bold tracking-tight">Permissions</h1>
                         <p className="text-muted-foreground">Manage system permissions and access controls</p>
                     </div>
-                    <Button asChild>
-                        <Link href="/permissions/create">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Permission
-                        </Link>
-                    </Button>
+                    {canCreate(userPermissions, 'permissions') && (
+                        <Button asChild>
+                            <Link href="/permissions/create">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Permission
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
@@ -175,19 +179,23 @@ export default function PermissionsIndex({ permissions, filters }: PermissionsIn
                                             <TableCell>{formatDate(permission.created_at)}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Button variant="outline" size="icon" asChild>
-                                                        <Link href={`/permissions/${permission.id}/edit`}>
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        onClick={() => handleDeleteClick(permission)}
-                                                        disabled={permission.roles_count > 0}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    {canEdit(userPermissions, 'permissions') && (
+                                                        <Button variant="outline" size="icon" asChild>
+                                                            <Link href={`/permissions/${permission.id}/edit`}>
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
+                                                        </Button>
+                                                    )}
+                                                    {canDelete(userPermissions, 'permissions') && (
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            onClick={() => handleDeleteClick(permission)}
+                                                            disabled={permission.roles_count > 0}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                         </TableRow>

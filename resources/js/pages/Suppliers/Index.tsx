@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 export default function SuppliersIndex({ suppliers, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
 
     return (
         <AppLayout
@@ -27,9 +29,11 @@ export default function SuppliersIndex({ suppliers, filters }) {
                             Manage your supplier contacts
                         </p>
                     </div>
-                    <Button asChild>
-                        <Link href={route('suppliers.create')}>Add Supplier</Link>
-                    </Button>
+                    {canCreate(userPermissions, 'suppliers') && (
+                        <Button asChild>
+                            <Link href={route('suppliers.create')}>Add Supplier</Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
@@ -138,50 +142,54 @@ export default function SuppliersIndex({ suppliers, filters }) {
                                                 </td>
                                                 <td className="py-4">
                                                     <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            asChild
-                                                            size="sm"
-                                                            variant="outline"
-                                                        >
-                                                            <Link
-                                                                href={route(
-                                                                    'suppliers.edit',
+                                                        {canEdit(userPermissions, 'suppliers') && (
+                                                            <Button
+                                                                asChild
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <Link
+                                                                    href={route(
+                                                                        'suppliers.edit',
+                                                                        supplier.id
+                                                                    )}
+                                                                >
+                                                                    Edit
+                                                                </Link>
+                                                            </Button>
+                                                        )}
+                                                        {canDelete(userPermissions, 'suppliers') && (
+                                                            <form
+                                                                action={route(
+                                                                    'suppliers.destroy',
                                                                     supplier.id
                                                                 )}
+                                                                method="post"
+                                                                className="inline"
                                                             >
-                                                                Edit
-                                                            </Link>
-                                                        </Button>
-                                                        <form
-                                                            action={route(
-                                                                'suppliers.destroy',
-                                                                supplier.id
-                                                            )}
-                                                            method="post"
-                                                            className="inline"
-                                                        >
-                                                            <input
-                                                                type="hidden"
-                                                                name="_method"
-                                                                value="delete"
-                                                            />
-                                                            <Button
-                                                                type="submit"
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                onClick={(e) => {
-                                                                    if (
-                                                                        !confirm(
-                                                                            'Are you sure you want to delete this supplier?'
-                                                                        )
-                                                                    ) {
-                                                                        e.preventDefault();
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Delete
-                                                            </Button>
-                                                        </form>
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="_method"
+                                                                    value="delete"
+                                                                />
+                                                                <Button
+                                                                    type="submit"
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    onClick={(e) => {
+                                                                        if (
+                                                                            !confirm(
+                                                                                'Are you sure you want to delete this supplier?'
+                                                                            )
+                                                                        ) {
+                                                                            e.preventDefault();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </form>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

@@ -13,10 +13,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 export default function ProductsIndex({ products, categories, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
 
     return (
         <AppLayout
@@ -35,9 +37,11 @@ export default function ProductsIndex({ products, categories, filters }) {
                             Manage your product inventory
                         </p>
                     </div>
-                    <Button asChild>
-                        <Link href={route('products.create')}>Add Product</Link>
-                    </Button>
+                    {canCreate(userPermissions, 'products') && (
+                        <Button asChild>
+                            <Link href={route('products.create')}>Add Product</Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
@@ -181,50 +185,54 @@ export default function ProductsIndex({ products, categories, filters }) {
                                                 </td>
                                                 <td className="py-4">
                                                     <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            asChild
-                                                            size="sm"
-                                                            variant="outline"
-                                                        >
-                                                            <Link
-                                                                href={route(
-                                                                    'products.edit',
+                                                        {canEdit(userPermissions, 'products') && (
+                                                            <Button
+                                                                asChild
+                                                                size="sm"
+                                                                variant="outline"
+                                                            >
+                                                                <Link
+                                                                    href={route(
+                                                                        'products.edit',
+                                                                        product.id
+                                                                    )}
+                                                                >
+                                                                    Edit
+                                                                </Link>
+                                                            </Button>
+                                                        )}
+                                                        {canDelete(userPermissions, 'products') && (
+                                                            <form
+                                                                action={route(
+                                                                    'products.destroy',
                                                                     product.id
                                                                 )}
+                                                                method="post"
+                                                                className="inline"
                                                             >
-                                                                Edit
-                                                            </Link>
-                                                        </Button>
-                                                        <form
-                                                            action={route(
-                                                                'products.destroy',
-                                                                product.id
-                                                            )}
-                                                            method="post"
-                                                            className="inline"
-                                                        >
-                                                            <input
-                                                                type="hidden"
-                                                                name="_method"
-                                                                value="delete"
-                                                            />
-                                                            <Button
-                                                                type="submit"
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                onClick={(e) => {
-                                                                    if (
-                                                                        !confirm(
-                                                                            'Are you sure you want to delete this product?'
-                                                                        )
-                                                                    ) {
-                                                                        e.preventDefault();
-                                                                    }
-                                                                }}
-                                                            >
-                                                                Delete
-                                                            </Button>
-                                                        </form>
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="_method"
+                                                                    value="delete"
+                                                                />
+                                                                <Button
+                                                                    type="submit"
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    onClick={(e) => {
+                                                                        if (
+                                                                            !confirm(
+                                                                                'Are you sure you want to delete this product?'
+                                                                            )
+                                                                        ) {
+                                                                            e.preventDefault();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </form>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>

@@ -11,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { canCreate, canEdit, canDelete, canView } from '@/lib/permissions';
 
 const statusColors = {
     pending: 'bg-yellow-500',
@@ -29,6 +30,7 @@ const statusLabels = {
 export default function PurchaseOrdersIndex({ orders, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
 
     const formatDate = (dateString) => {
         if (!dateString) return '-';
@@ -63,9 +65,11 @@ export default function PurchaseOrdersIndex({ orders, filters }) {
                             Manage purchase orders from suppliers
                         </p>
                     </div>
-                    <Button asChild>
-                        <Link href={route('purchase-orders.create')}>Create Order</Link>
-                    </Button>
+                    {canCreate(userPermissions, 'purchase-orders') && (
+                        <Button asChild>
+                            <Link href={route('purchase-orders.create')}>Create Order</Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
@@ -181,21 +185,23 @@ export default function PurchaseOrdersIndex({ orders, filters }) {
                                                 </td>
                                                 <td className="py-4 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            asChild
-                                                            size="sm"
-                                                            variant="outline"
-                                                        >
-                                                            <Link
-                                                                href={route(
-                                                                    'purchase-orders.show',
-                                                                    order.id
-                                                                )}
+                                                        {canView(userPermissions, 'purchase-orders') && (
+                                                            <Button
+                                                                asChild
+                                                                size="sm"
+                                                                variant="outline"
                                                             >
-                                                                View
-                                                            </Link>
-                                                        </Button>
-                                                        {order.status === 'pending' && (
+                                                                <Link
+                                                                    href={route(
+                                                                        'purchase-orders.show',
+                                                                        order.id
+                                                                    )}
+                                                                >
+                                                                    View
+                                                                </Link>
+                                                            </Button>
+                                                        )}
+                                                        {canEdit(userPermissions, 'purchase-orders') && order.status === 'pending' && (
                                                             <>
                                                                 <Button
                                                                     asChild

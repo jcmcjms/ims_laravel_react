@@ -1,11 +1,21 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function WarehousesEdit({ warehouse }) {
+    const { props } = usePage();
+    const userPermissions = props.auth?.user?.permissions || [];
+
+    useEffect(() => {
+        if (!userPermissions.includes('edit-warehouses')) {
+            router.visit('/unauthorized');
+        }
+    }, [userPermissions]);
+
     const { data, setData, put, errors, processing } = useForm({
         name: warehouse.name || '',
         location: warehouse.location || '',

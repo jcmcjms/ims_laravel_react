@@ -29,6 +29,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 interface Category {
     id: number;
@@ -59,6 +60,7 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
     const { props } = usePage();
     const errors = props.errors as Record<string, string>;
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
@@ -89,18 +91,22 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                 <TableCell>{formatDate(category.created_at)}</TableCell>
                 <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href={`/categories/${category.id}/edit`}>
-                                <Pencil className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            size="icon"
-                            onClick={() => handleDeleteClick(category)}
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {canEdit(userPermissions, 'categories') && (
+                            <Button variant="outline" size="icon" asChild>
+                                <Link href={`/categories/${category.id}/edit`}>
+                                    <Pencil className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                        )}
+                        {canDelete(userPermissions, 'categories') && (
+                            <Button
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => handleDeleteClick(category)}
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        )}
                     </div>
                 </TableCell>
             </TableRow>
@@ -118,12 +124,14 @@ export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
                         <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
                         <p className="text-muted-foreground">Manage product categories</p>
                     </div>
-                    <Button asChild>
-                        <Link href="/categories/create">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Category
-                        </Link>
-                    </Button>
+                    {canCreate(userPermissions, 'categories') && (
+                        <Button asChild>
+                            <Link href="/categories/create">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Category
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
