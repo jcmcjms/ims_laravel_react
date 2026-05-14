@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
     Select,
     SelectContent,
@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/select';
 
 export default function PurchaseOrdersEdit({ order, suppliers, products }) {
-    const { toast } = useToast();
 
     // Initialize items from existing order
     const [items, setItems] = useState(

@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { success, error as showError } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function InventoryCreate({ products, warehouses }) {
     const { data, setData, post, errors, processing } = useForm({
@@ -26,18 +26,10 @@ export default function InventoryCreate({ products, warehouses }) {
 
         post(route('inventory.store'), {
             onSuccess: () => {
-                success({
-                    title: 'Success',
-                    description: 'Inventory record created successfully.',
-                });
+                toast.success('Inventory record created successfully.');
             },
             onError: (errors) => {
-                if (errors.message) {
-                    showError({
-                        title: 'Error',
-                        description: errors.message,
-                    });
-                }
+                toast.error(errors.message || 'Failed to create inventory record.');
             },
         });
     };

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
     Select,
     SelectContent,
@@ -38,7 +38,6 @@ const statusLabels = {
 };
 
 export default function PurchaseOrdersShow({ order, warehouses }) {
-    const { toast } = useToast();
     const [receiveDialogOpen, setReceiveDialogOpen] = useState(false);
     const [selectedWarehouse, setSelectedWarehouse] = useState('');
     const [receiveQuantities, setReceiveQuantities] = useState({});

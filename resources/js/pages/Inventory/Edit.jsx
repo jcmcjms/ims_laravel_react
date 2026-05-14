@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { success, error as showError } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function InventoryEdit({ inventory, products, warehouses }) {
     const { data, setData, put, errors, processing } = useForm({
@@ -23,18 +23,10 @@ export default function InventoryEdit({ inventory, products, warehouses }) {
 
         put(route('inventory.update', inventory.id), {
             onSuccess: () => {
-                success({
-                    title: 'Success',
-                    description: 'Inventory updated successfully.',
-                });
+                toast.success('Inventory updated successfully.');
             },
             onError: (errors) => {
-                if (errors.message) {
-                    showError({
-                        title: 'Error',
-                        description: errors.message,
-                    });
-                }
+                toast.error(errors.message || 'Failed to update inventory.');
             },
         });
     };
