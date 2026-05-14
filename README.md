@@ -1,6 +1,6 @@
 # Laravel IMS - Inventory Management System
 
-A modern inventory management system built with Laravel 12, Inertia.js, and React 19. Features a beautiful UI with shadcn/ui components and Tailwind CSS v4.
+A modern inventory management system built with Laravel 12, Inertia.js, React 19, and Tailwind CSS v4. Features a beautiful UI with shadcn/ui components, Sonner toast notifications, and a comprehensive role-based access control system.
 
 ## Tech Stack
 
@@ -9,6 +9,7 @@ A modern inventory management system built with Laravel 12, Inertia.js, and Reac
 | **Backend** | Laravel 12 (PHP 8.2+) |
 | **Frontend** | React 19 with TypeScript |
 | **Styling** | Tailwind CSS v4 + shadcn/ui |
+| **Toast Notifications** | Sonner |
 | **Build Tool** | Vite 6 |
 | **Auth** | Laravel Breeze (Inertia) |
 | **Routing** | Inertia.js + Ziggy |
@@ -31,31 +32,124 @@ A modern inventory management system built with Laravel 12, Inertia.js, and Reac
 - **Inventory Tracking**: Per-warehouse stock levels with minimum stock thresholds
 
 ### Supply Chain
-- **Suppliers**: Supplier directory with contact information
-- **Purchase Orders**: Create, track, and manage purchase orders
-- **Purchase Order Items**: Line items for purchase orders with received quantity tracking
+- **Suppliers**: Supplier directory with contact information and management
+- **Purchase Orders**: Create, track, and manage purchase orders with line items
+- **Purchase Order Items**: Line items with quantity tracking and received quantities
 
 ### Stock Operations
-- **Stock Movements**: Track inventory changes (purchase, sale, adjustment, return)
+- **Stock Movements**: Track all inventory changes (purchase, sale, adjustment, return, transfer)
 - **Stock Adjustments**: Manual inventory adjustments with notes and audit trail
 - **Low Stock Alerts**: Automatic detection of items below minimum stock level
 
 ### Reporting & Analytics
 - **Inventory Valuation Report**: Current inventory value by product/warehouse
-- **Low Stock Report**: Items needing reorder attention
-- **Stock Movements Report**: Historical view of all inventory changes
-
-### User Management & Security
-- **Role-Based Access Control**: Create and manage roles with permissions
-- **Direct Permissions**: Assign specific permissions to users
-- **User Management**: Full CRUD for system users
-- **Profile Settings**: User profile and password management
+- **Low Stock Report**: Items needing reorder attention with quantities
+- **Stock Movements Report**: Historical view of all inventory changes with filters
 
 ### User Interface
-- **Responsive Design**: Works on desktop and mobile
+- **Responsive Design**: Works on desktop and mobile devices
 - **Dark/Light Mode**: System-aware theme with manual toggle
+- **Toast Notifications**: Sonner-powered toast notifications for all actions
+- **Flash Messages**: Session flash messages on form submissions
+- **Pagination**: Built-in pagination on all list pages
+- **Search**: Search functionality on list pages for easy filtering
 - **Modern Components**: shadcn/ui components with Tailwind CSS
-- **Dashboard**: Real-time metrics and recent activity overview
+
+### User Management & Security
+- **Role-Based Access Control**: Four predefined roles with specific permissions
+- **32 Granular Permissions**: Fine-grained control over every action in the system
+- **User Management**: Full CRUD for system users with role assignment
+- **Profile Settings**: User profile and password management
+
+## Roles & Permissions
+
+### Predefined Roles
+
+| Role | Description | Permission Count |
+|------|-------------|------------------|
+| **Admin** | Full system access with all permissions | 40 |
+| **Manager** | View/Create/Edit access, no delete permissions | 25 |
+| **Warehouse Staff** | Inventory and stock operations focus | 10 |
+| **Viewer** | Read-only access to all data | 15 |
+
+### Role Details
+
+#### Admin
+- Complete access to all system features
+- Can manage users, roles, and permissions
+- Can create, edit, and delete all records
+- Full access to reports and settings
+
+#### Manager
+- Can manage: products, categories, warehouses, suppliers, inventory, purchase orders
+- Can view: users, roles, reports, settings
+- **Cannot delete** any records
+- Can adjust inventory quantities
+
+#### Warehouse Staff
+- Focus on day-to-day inventory operations
+- Can view/create/edit inventory records
+- Can record stock movements
+- Can view: products, warehouses, suppliers (for reference)
+- No access to user management, roles, or reports
+
+#### Viewer
+- Read-only access to all operational data
+- Can view all reports
+- Perfect for stakeholders, auditors, or managers needing visibility
+
+### 32 Granular Permissions
+
+| Category | Permissions |
+|----------|-------------|
+| **User Management** | `view-users`, `create-users`, `edit-users`, `delete-users` |
+| **Role Management** | `view-roles`, `create-roles`, `edit-roles`, `delete-roles` |
+| **Category Management** | `view-categories`, `create-categories`, `edit-categories`, `delete-categories` |
+| **Product Management** | `view-products`, `create-products`, `edit-products`, `delete-products` |
+| **Warehouse Management** | `view-warehouses`, `create-warehouses`, `edit-warehouses`, `delete-warehouses` |
+| **Supplier Management** | `view-suppliers`, `create-suppliers`, `edit-suppliers`, `delete-suppliers` |
+| **Inventory Management** | `view-inventory`, `create-inventory`, `edit-inventory`, `adjust-inventory` |
+| **Purchase Orders** | `view-purchase-orders`, `create-purchase-orders`, `edit-purchase-orders`, `delete-purchase-orders` |
+| **Stock Movements** | `view-stock-movements`, `create-stock-movements` |
+| **Reports** | `view-reports`, `view-inventory-valuation-report`, `view-low-stock-report`, `view-stock-movements-report` |
+| **Settings** | `view-settings`, `edit-settings` |
+
+## Pages & Navigation
+
+### Dashboard
+- Real-time metrics overview
+- Recent activity timeline
+- Quick stats (total products, low stock alerts, pending orders)
+
+### Inventory Management
+- `/categories` - Product category management
+- `/products` - Product catalog with SKU and pricing
+- `/warehouses` - Warehouse locations management
+- `/inventory` - Stock levels per warehouse
+
+### Supply Chain
+- `/suppliers` - Supplier directory
+- `/purchase-orders` - Purchase order management
+- `/purchase-orders/{id}` - Purchase order details with line items
+
+### Stock Operations
+- `/stock-movements` - Stock movement history
+- `/stock-movements/adjust` - Stock adjustment form
+
+### Reports
+- `/reports/inventory-valuation` - Inventory value by product/warehouse
+- `/reports/low-stock` - Items below minimum stock level
+- `/reports/stock-movements` - Historical stock movements
+
+### User Management
+- `/users` - User list and management
+- `/roles` - Role management with permission assignment
+- `/permissions` - Permission management
+
+### Settings
+- `/settings/profile` - User profile settings
+- `/settings/password` - Password change
+- `/settings/appearance` - Theme preferences
 
 ## Installation
 
@@ -135,9 +229,9 @@ Create the database using your database management tool.
 php artisan migrate
 ```
 
-### 8. (Optional) Seed Database
+### 8. Seed Database
 
-Seed the database with a default admin user:
+Seed the database with default roles and permissions, plus a default admin user:
 
 ```bash
 php artisan db:seed
@@ -161,8 +255,8 @@ composer dev
 
 This starts:
 - Laravel development server at `http://localhost:8000`
-- Queue worker for background jobs
 - Vite dev server with hot reload
+- Automatically opens in your browser
 
 ### Individual Services
 
@@ -220,46 +314,50 @@ npm run build
 laravel-ims/
 ├── app/
 │   ├── Http/
-│   │   └── Controllers/          # Application controllers
-│   │       ├── Auth/             # Authentication controllers
-│   │       ├── Settings/         # User settings controllers
-│   │       └── *.php            # Resource controllers
-│   └── Models/                   # Eloquent models
-│       ├── Category.php
-│       ├── Inventory.php
-│       ├── Permission.php
-│       ├── Product.php
-│       ├── PurchaseOrder.php
-│       ├── PurchaseOrderItem.php
-│       ├── Role.php
-│       ├── StockMovement.php
-│       ├── Supplier.php
-│       ├── User.php
-│       └── Warehouse.php
+│   │   └── Controllers/
+│   │       ├── Auth/
+│   │       ├── Settings/
+│   │       └── *.php
+│   ├── Models/
+│   │   ├── Category.php
+│   │   ├── Inventory.php
+│   │   ├── Permission.php
+│   │   ├── Product.php
+│   │   ├── PurchaseOrder.php
+│   │   ├── PurchaseOrderItem.php
+│   │   ├── Role.php
+│   │   ├── StockAdjustment.php
+│   │   ├── StockMovement.php
+│   │   ├── Supplier.php
+│   │   ├── User.php
+│   │   └── Warehouse.php
 ├── database/
-│   ├── migrations/               # Database migrations
-│   └── seeders/                  # Database seeders
+│   ├── migrations/
+│   └── seeders/
+│       ├── DatabaseSeeder.php
+│       ├── PermissionSeeder.php
+│       └── RoleSeeder.php
 ├── resources/
 │   ├── css/
-│   │   └── app.css              # Tailwind CSS entry point
+│   │   └── app.css
 │   └── js/
-│       ├── app.tsx              # React entry point
-│       ├── components/          # React components
-│       │   ├── ui/             # shadcn/ui components
-│       │   └── *.tsx           # Custom components
-│       ├── hooks/              # Custom React hooks
-│       ├── layouts/           # Page layouts
-│       ├── lib/               # Utilities
-│       └── pages/             # Page components
+│       ├── app.tsx
+│       ├── components/
+│       │   ├── ui/
+│       │   └── *.tsx
+│       ├── hooks/
+│       ├── layouts/
+│       ├── lib/
+│       └── pages/
 ├── routes/
-│   ├── web.php                 # Main web routes
-│   ├── auth.php                # Auth routes
-│   └── settings.php            # Settings routes
-├── config/                     # Laravel configuration
-├── vite.config.js             # Vite configuration
-├── tailwind.config.js         # Tailwind (if separate)
-├── components.json            # shadcn/ui configuration
-└── package.json               # NPM dependencies
+│   ├── web.php
+│   ├── auth.php
+│   └── settings.php
+├── config/
+├── vite.config.js
+├── tailwind.config.js
+├── components.json
+└── package.json
 ```
 
 ## Database Schema
@@ -267,13 +365,16 @@ laravel-ims/
 ```
 users
 ├── id, name, email, password, timestamps
-├── [role_id via model_has_roles]
+├── role_id (foreign key)
 
 roles
 ├── id, name (unique), guard_name, description, timestamps
 
 permissions
 ├── id, name (unique), guard_name, description, timestamps
+
+role_permissions
+├── id, role_id, permission_id, timestamps
 
 model_has_roles
 ├── id, role_id, model_type, model_id, timestamps
@@ -282,14 +383,14 @@ model_has_permissions
 ├── id, permission_id, model_type, model_id, timestamps
 
 categories
-├── id, name, description, parent_id (self-ref), timestamps
+├── id, name, description, parent_id (self-referential), timestamps
 
 products
 ├── id, name, sku (unique), description, category_id
 ├── unit_price, cost_price, image, timestamps
 
 warehouses
-├── id, name, location, timestamps
+├── id, name, location, contact_info, timestamps
 
 suppliers
 ├── id, name, contact_person, email, phone, address, timestamps
@@ -297,7 +398,7 @@ suppliers
 inventory
 ├── id, product_id, warehouse_id
 ├── quantity, min_stock_level, timestamps
-└── [unique: product_id + warehouse_id]
+└── [unique constraint on product_id + warehouse_id]
 
 purchase_orders
 ├── id, supplier_id, order_date, expected_delivery
@@ -310,7 +411,11 @@ purchase_order_items
 stock_movements
 ├── id, product_id, warehouse_id, movement_type
 ├── quantity, reference_type, reference_id, notes, timestamps
-└── [movement_type: purchase|sale|adjustment|return]
+└── [movement_type: purchase|sale|adjustment|return|transfer]
+
+stock_adjustments
+├── id, user_id, reason, timestamps
+└── [tracks manual inventory corrections]
 ```
 
 ## Environment Variables
@@ -332,10 +437,10 @@ stock_movements
 ## API Routes
 
 ### Dashboard
-- `GET /dashboard` - Dashboard with metrics
+- `GET /dashboard` - Dashboard with metrics and recent activity
 
 ### User Management
-- `GET /users` - List users
+- `GET /users` - List users (paginated)
 - `POST /users` - Create user
 - `GET /users/{id}` - Show user
 - `PUT /users/{id}` - Update user
@@ -347,7 +452,7 @@ stock_movements
 - `GET /roles/{id}` - Show role
 - `PUT /roles/{id}` - Update role
 - `DELETE /roles/{id}` - Delete role
-- `GET /permissions` - List permissions
+- `GET /permissions` - List all permissions
 - `POST /permissions` - Create permission
 - `PUT /permissions/{id}` - Update permission
 - `DELETE /permissions/{id}` - Delete permission
@@ -359,7 +464,7 @@ stock_movements
 - `PUT /categories/{id}` - Update category
 - `DELETE /categories/{id}` - Delete category
 
-- `GET /products` - List products
+- `GET /products` - List products (paginated, searchable)
 - `POST /products` - Create product
 - `GET /products/{id}` - Show product
 - `PUT /products/{id}` - Update product
@@ -377,19 +482,21 @@ stock_movements
 - `PUT /suppliers/{id}` - Update supplier
 - `DELETE /suppliers/{id}` - Delete supplier
 
-- `GET /inventory` - List inventory
+- `GET /inventory` - List inventory (paginated, searchable)
 - `POST /inventory` - Create inventory record
 - `GET /inventory/{id}` - Show inventory
 - `PUT /inventory/{id}` - Update inventory
 - `DELETE /inventory/{id}` - Delete inventory
 
-- `GET /purchase-orders` - List purchase orders
+### Supply Chain
+- `GET /purchase-orders` - List purchase orders (paginated)
 - `POST /purchase-orders` - Create purchase order
-- `GET /purchase-orders/{id}` - Show purchase order
+- `GET /purchase-orders/{id}` - Show purchase order with items
 - `PUT /purchase-orders/{id}` - Update purchase order
 - `DELETE /purchase-orders/{id}` - Delete purchase order
 
-- `GET /stock-movements` - List stock movements
+### Stock Operations
+- `GET /stock-movements` - List stock movements (paginated, searchable)
 - `POST /stock-movements` - Create stock movement
 - `GET /stock-movements/adjust` - Stock adjustment form
 - `POST /stock-movements/adjust` - Submit stock adjustment
@@ -399,6 +506,13 @@ stock_movements
 - `GET /reports/low-stock` - Low stock report
 - `GET /reports/stock-movements` - Stock movements report
 
+### Settings
+- `GET /settings/profile` - Profile settings page
+- `PUT /settings/profile` - Update profile
+- `GET /settings/password` - Password settings page
+- `PUT /settings/password` - Update password
+- `GET /settings/appearance` - Appearance settings
+
 ## Authentication
 
 The application uses Laravel Breeze with Inertia.js for authentication:
@@ -407,6 +521,7 @@ The application uses Laravel Breeze with Inertia.js for authentication:
 - **Register**: `GET /register`, `POST /register`
 - **Password Reset**: `GET /forgot-password`, `POST /forgot-password`
 - **Email Verification**: `GET /verify-email`, `POST /verification-notification`
+- **Logout**: `POST /logout`
 
 ## Default User
 
