@@ -7,12 +7,14 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 | Layer | Technology |
 |-------|------------|
 | **Backend** | Laravel 12 (PHP 8.2+) |
-| **Frontend** | React 19 with TypeScript |
-| **Styling** | Tailwind CSS v4 + shadcn/ui |
+| **Frontend** | React 19 with TypeScript and Inertia.js |
+| **Styling** | Tailwind CSS v4 with CSS-based configuration |
+| **UI Components** | shadcn/ui (Radix UI primitives) |
 | **Toast Notifications** | Sonner |
 | **Build Tool** | Vite 6 |
 | **Auth** | Laravel Breeze (Inertia) |
 | **Routing** | Inertia.js + Ziggy |
+| **Icons** | Lucide React |
 | **Database** | SQLite (default) / MySQL / PostgreSQL |
 | **Testing** | Pest PHP |
 
@@ -35,10 +37,11 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 - **Suppliers**: Supplier directory with contact information and management
 - **Purchase Orders**: Create, track, and manage purchase orders with line items
 - **Purchase Order Items**: Line items with quantity tracking and received quantities
+- **PO Receiving**: Mark purchase orders as received and automatically update inventory
 
 ### Stock Operations
-- **Stock Movements**: Track all inventory changes (purchase, sale, adjustment, return, transfer)
-- **Stock Adjustments**: Manual inventory adjustments with notes and audit trail
+- **Stock Movements**: Track all inventory changes (purchase, sale, adjustment, return)
+- **Stock Adjustments**: Manual inventory corrections with notes
 - **Low Stock Alerts**: Automatic detection of items below minimum stock level
 
 ### Reporting & Analytics
@@ -53,13 +56,13 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 - **Flash Messages**: Session flash messages on form submissions
 - **Pagination**: Built-in pagination on all list pages
 - **Search**: Search functionality on list pages for easy filtering
-- **Modern Components**: shadcn/ui components with Tailwind CSS
+- **Data Tables**: Sortable, filterable data tables with shadcn/ui components
 
 ### User Management & Security
 - **Role-Based Access Control**: Four predefined roles with specific permissions
-- **32 Granular Permissions**: Fine-grained control over every action in the system
+- **40 Granular Permissions**: Fine-grained control over every action in the system
 - **User Management**: Full CRUD for system users with role assignment
-- **Profile Settings**: User profile and password management
+- **Profile Settings**: User profile, password, and appearance management
 
 ## Roles & Permissions
 
@@ -68,9 +71,9 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 | Role | Description | Permission Count |
 |------|-------------|------------------|
 | **Admin** | Full system access with all permissions | 40 |
-| **Manager** | View/Create/Edit access, no delete permissions | 25 |
+| **Manager** | View/Create/Edit access, no delete permissions | 27 |
 | **Warehouse Staff** | Inventory and stock operations focus | 10 |
-| **Viewer** | Read-only access to all data | 15 |
+| **Viewer** | Read-only access to all data | 16 |
 
 ### Role Details
 
@@ -98,7 +101,7 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 - Can view all reports
 - Perfect for stakeholders, auditors, or managers needing visibility
 
-### 32 Granular Permissions
+### 40 Granular Permissions
 
 | Category | Permissions |
 |----------|-------------|
@@ -117,20 +120,19 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 ## Pages & Navigation
 
 ### Dashboard
-- Real-time metrics overview
-- Recent activity timeline
-- Quick stats (total products, low stock alerts, pending orders)
+- `/dashboard` - Real-time metrics, recent activity, quick stats
 
 ### Inventory Management
-- `/categories` - Product category management
-- `/products` - Product catalog with SKU and pricing
+- `/categories` - Category management with hierarchical structure
+- `/products` - Product catalog with SKU, pricing, and images
 - `/warehouses` - Warehouse locations management
-- `/inventory` - Stock levels per warehouse
+- `/inventory` - Stock levels per warehouse with min stock thresholds
 
 ### Supply Chain
-- `/suppliers` - Supplier directory
+- `/suppliers` - Supplier directory with contact information
 - `/purchase-orders` - Purchase order management
 - `/purchase-orders/{id}` - Purchase order details with line items
+- `/purchase-orders/{id}/edit` - Edit purchase order
 
 ### Stock Operations
 - `/stock-movements` - Stock movement history
@@ -139,17 +141,21 @@ A modern inventory management system built with Laravel 12, Inertia.js, React 19
 ### Reports
 - `/reports/inventory-valuation` - Inventory value by product/warehouse
 - `/reports/low-stock` - Items below minimum stock level
-- `/reports/stock-movements` - Historical stock movements
+- `/reports/stock-movements` - Historical stock movements with filters
 
 ### User Management
-- `/users` - User list and management
+- `/users` - User list with role assignments
+- `/users/create` - Create new user
+- `/users/{id}/edit` - Edit user
 - `/roles` - Role management with permission assignment
+- `/roles/create` - Create new role
+- `/roles/{id}/edit` - Edit role permissions
 - `/permissions` - Permission management
 
 ### Settings
 - `/settings/profile` - User profile settings
 - `/settings/password` - Password change
-- `/settings/appearance` - Theme preferences
+- `/settings/appearance` - Theme preferences (light/dark/system)
 
 ## Installation
 
@@ -178,7 +184,7 @@ Copy the example environment file and configure your database:
 
 ```bash
 # Copy environment file
-cp .env.example .env
+copy .env.example .env
 
 # Generate application key
 php artisan key:generate
@@ -217,7 +223,7 @@ DB_PASSWORD=
 
 **For SQLite:**
 ```bash
-touch database/database.sqlite
+type nul > database\database.sqlite
 ```
 
 **For MySQL/PostgreSQL:**
@@ -256,7 +262,7 @@ composer dev
 This starts:
 - Laravel development server at `http://localhost:8000`
 - Vite dev server with hot reload
-- Automatically opens in your browser
+- Queue worker for background jobs
 
 ### Individual Services
 
@@ -316,23 +322,59 @@ laravel-ims/
 │   ├── Http/
 │   │   └── Controllers/
 │   │       ├── Auth/
+│   │       │   ├── AuthenticatedSessionController.php
+│   │       │   ├── ConfirmablePasswordController.php
+│   │       │   ├── EmailVerificationNotificationController.php
+│   │       │   ├── EmailVerificationPromptController.php
+│   │       │   ├── NewPasswordController.php
+│   │       │   ├── PasswordResetLinkController.php
+│   │       │   └── VerifyEmailController.php
 │   │       ├── Settings/
-│   │       └── *.php
-│   ├── Models/
-│   │   ├── Category.php
-│   │   ├── Inventory.php
-│   │   ├── Permission.php
-│   │   ├── Product.php
-│   │   ├── PurchaseOrder.php
-│   │   ├── PurchaseOrderItem.php
-│   │   ├── Role.php
-│   │   ├── StockAdjustment.php
-│   │   ├── StockMovement.php
-│   │   ├── Supplier.php
-│   │   ├── User.php
-│   │   └── Warehouse.php
+│   │       │   ├── PasswordController.php
+│   │       │   └── ProfileController.php
+│   │       ├── CategoryController.php
+│   │       ├── DashboardController.php
+│   │       ├── InventoryController.php
+│   │       ├── PermissionController.php
+│   │       ├── ProductController.php
+│   │       ├── PurchaseOrderController.php
+│   │       ├── ReportController.php
+│   │       ├── RoleController.php
+│   │       ├── StockMovementController.php
+│   │       ├── SupplierController.php
+│   │       ├── UserManagementController.php
+│   │       └── WarehouseController.php
+│   └── Models/
+│       ├── Category.php
+│       ├── Inventory.php
+│       ├── Permission.php
+│       ├── Product.php
+│       ├── PurchaseOrder.php
+│       ├── PurchaseOrderItem.php
+│       ├── Role.php
+│       ├── StockMovement.php
+│       ├── Supplier.php
+│       ├── User.php
+│       └── Warehouse.php
 ├── database/
 │   ├── migrations/
+│   │   ├── 0001_01_01_000000_create_users_table.php
+│   │   ├── 0001_01_01_000001_create_cache_table.php
+│   │   ├── 0001_01_01_000002_create_jobs_table.php
+│   │   ├── 2026_05_13_000003_create_categories_table.php
+│   │   ├── 2026_05_13_000004_create_warehouses_table.php
+│   │   ├── 2026_05_13_000005_create_suppliers_table.php
+│   │   ├── 2026_05_13_000006_create_products_table.php
+│   │   ├── 2026_05_13_000007_create_inventory_table.php
+│   │   ├── 2026_05_13_000008_create_purchase_orders_table.php
+│   │   ├── 2026_05_13_000009_create_purchase_order_items_table.php
+│   │   ├── 2026_05_13_000010_create_stock_movements_table.php
+│   │   ├── 2026_05_14_000001_create_roles_table.php
+│   │   ├── 2026_05_14_000002_create_permissions_table.php
+│   │   ├── 2026_05_14_000003_create_role_permissions_table.php
+│   │   ├── 2026_05_14_000004_create_model_has_roles_table.php
+│   │   ├── 2026_05_14_000005_create_model_has_permissions_table.php
+│   │   └── 2026_05_14_000006_add_fields_to_users_table.php
 │   └── seeders/
 │       ├── DatabaseSeeder.php
 │       ├── PermissionSeeder.php
@@ -342,22 +384,42 @@ laravel-ims/
 │   │   └── app.css
 │   └── js/
 │       ├── app.tsx
+│       ├── ssr.jsx
 │       ├── components/
-│       │   ├── ui/
-│       │   └── *.tsx
+│       │   ├── ui/           # shadcn/ui components
+│       │   └── *.tsx         # Custom components
 │       ├── hooks/
+│       │   └── use-appearance.tsx
 │       ├── layouts/
+│       │   ├── app-layout.tsx
+│       │   ├── auth-layout.tsx
+│       │   ├── auth/
+│       │   └── settings/
 │       ├── lib/
+│       │   └── utils.ts
 │       └── pages/
+│           ├── dashboard.tsx
+│           ├── Users/
+│           ├── Categories/
+│           ├── Products/
+│           ├── Warehouses/
+│           ├── Suppliers/
+│           ├── Inventory/
+│           ├── PurchaseOrders/
+│           ├── StockMovements/
+│           ├── Reports/
+│           ├── Roles/
+│           ├── Permissions/
+│           ├── auth/
+│           └── settings/
 ├── routes/
 │   ├── web.php
 │   ├── auth.php
 │   └── settings.php
-├── config/
-├── vite.config.js
-├── tailwind.config.js
 ├── components.json
-└── package.json
+├── vite.config.js
+├── package.json
+└── composer.json
 ```
 
 ## Database Schema
@@ -365,7 +427,11 @@ laravel-ims/
 ```
 users
 ├── id, name, email, password, timestamps
-├── role_id (foreign key)
+├── role_id (foreign key → roles.id, nullable)
+├── is_active (boolean)
+├── phone (nullable)
+├── address (nullable)
+└── avatar (nullable)
 
 roles
 ├── id, name (unique), guard_name, description, timestamps
@@ -374,55 +440,68 @@ permissions
 ├── id, name (unique), guard_name, description, timestamps
 
 role_permissions
-├── id, role_id, permission_id, timestamps
+├── id, role_id (foreign key → roles.id), permission_id (foreign key → permissions.id), timestamps
 
 model_has_roles
-├── id, role_id, model_type, model_id, timestamps
+├── id, role_id (foreign key → roles.id), model_type, model_id, timestamps
 
 model_has_permissions
-├── id, permission_id, model_type, model_id, timestamps
+├── id, permission_id (foreign key → permissions.id), model_type, model_id, timestamps
 
 categories
-├── id, name, description, parent_id (self-referential), timestamps
+├── id, name, description (nullable), parent_id (self-referential → categories.id, nullable), timestamps
+└── Indexes: parent_id, created_at
 
 products
-├── id, name, sku (unique), description, category_id
-├── unit_price, cost_price, image, timestamps
+├── id, name, sku (unique), description (nullable), category_id (foreign key → categories.id, nullable)
+├── unit_price (decimal, default 0), cost_price (decimal, default 0)
+├── image (nullable)
+└── timestamps
+└── Indexes: category_id, sku, name, created_at
 
 warehouses
-├── id, name, location, contact_info, timestamps
+├── id, name, location, timestamps
 
 suppliers
-├── id, name, contact_person, email, phone, address, timestamps
+├── id, name, contact_person (nullable), email (nullable), phone (nullable), address (nullable), timestamps
 
 inventory
-├── id, product_id, warehouse_id
-├── quantity, min_stock_level, timestamps
-└── [unique constraint on product_id + warehouse_id]
+├── id, product_id (foreign key → products.id), warehouse_id (foreign key → warehouses.id)
+├── quantity (integer, default 0, check >= 0)
+├── min_stock_level (integer, default 0, check >= 0)
+├── timestamps
+└── Unique constraint on (product_id, warehouse_id)
+└── Indexes: warehouse_id, quantity, created_at
 
 purchase_orders
-├── id, supplier_id, order_date, expected_delivery
-├── status (pending|ordered|received|cancelled), notes, timestamps
+├── id, supplier_id (foreign key → suppliers.id)
+├── order_date, expected_delivery (dates)
+├── status (enum: pending, ordered, received, cancelled)
+├── notes (nullable)
+└── timestamps
 
 purchase_order_items
-├── id, purchase_order_id, product_id
-├── quantity, unit_price, received_quantity, timestamps
+├── id, purchase_order_id (foreign key → purchase_orders.id)
+├── product_id (foreign key → products.id)
+├── quantity, unit_price
+├── received_quantity (default 0)
+└── timestamps
 
 stock_movements
-├── id, product_id, warehouse_id, movement_type
-├── quantity, reference_type, reference_id, notes, timestamps
-└── [movement_type: purchase|sale|adjustment|return|transfer]
-
-stock_adjustments
-├── id, user_id, reason, timestamps
-└── [tracks manual inventory corrections]
+├── id, product_id (foreign key → products.id), warehouse_id (foreign key → warehouses.id)
+├── movement_type (enum: purchase, sale, adjustment, return)
+├── quantity
+├── reference_type (string, nullable), reference_id (bigint, nullable)
+├── notes (nullable)
+└── timestamps
+└── Indexes: product_id, warehouse_id, movement_type, (reference_type, reference_id), created_at
 ```
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `APP_NAME` | Laravel | Application name |
+| `APP_NAME` | IMS | Application name |
 | `APP_ENV` | local | Environment (local/production) |
 | `APP_KEY` | - | Application encryption key |
 | `APP_DEBUG` | true | Debug mode |
@@ -430,6 +509,7 @@ stock_adjustments
 | `APP_URL` | http://localhost | Application URL |
 | `DB_CONNECTION` | sqlite | Database driver |
 | `SESSION_DRIVER` | database | Session driver |
+| `SESSION_LIFETIME` | 120 | Session lifetime in minutes |
 | `QUEUE_CONNECTION` | database | Queue driver |
 | `CACHE_STORE` | database | Cache driver |
 | `BCRYPT_ROUNDS` | 12 | Password hashing rounds |
@@ -494,6 +574,7 @@ stock_adjustments
 - `GET /purchase-orders/{id}` - Show purchase order with items
 - `PUT /purchase-orders/{id}` - Update purchase order
 - `DELETE /purchase-orders/{id}` - Delete purchase order
+- `POST /purchase-orders/{id}/receive` - Mark PO as received
 
 ### Stock Operations
 - `GET /stock-movements` - List stock movements (paginated, searchable)
@@ -508,10 +589,25 @@ stock_adjustments
 
 ### Settings
 - `GET /settings/profile` - Profile settings page
-- `PUT /settings/profile` - Update profile
+- `PATCH /settings/profile` - Update profile
+- `DELETE /settings/profile` - Delete account
 - `GET /settings/password` - Password settings page
 - `PUT /settings/password` - Update password
 - `GET /settings/appearance` - Appearance settings
+
+### Authentication
+- `GET /login` - Login page
+- `POST /login` - Authenticate user
+- `POST /logout` - End session
+- `GET /forgot-password` - Password reset request
+- `POST /forgot-password` - Send reset email
+- `GET /reset-password/{token}` - Reset password page
+- `POST /reset-password` - Update password
+- `GET /verify-email` - Email verification prompt
+- `GET /verify-email/{id}/{hash}` - Verify email
+- `POST /email/verification-notification` - Resend verification
+- `GET /confirm-password` - Confirm password
+- `POST /confirm-password` - Confirm password
 
 ## Authentication
 
@@ -541,7 +637,7 @@ After seeding, you can login with:
 
 1. **Environment**
    ```bash
-   cp .env.example .env
+   copy .env.example .env
    php artisan key:generate --force
    ```
 
