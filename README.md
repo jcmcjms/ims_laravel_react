@@ -518,10 +518,15 @@ stock_adjustments
 The application uses Laravel Breeze with Inertia.js for authentication:
 
 - **Login**: `GET /login`, `POST /login`
-- **Register**: `GET /register`, `POST /register`
 - **Password Reset**: `GET /forgot-password`, `POST /forgot-password`
 - **Email Verification**: `GET /verify-email`, `POST /verification-notification`
 - **Logout**: `POST /logout`
+
+### Self-Registration
+
+**Self-registration is disabled.** To create an account, please contact the administrator at admin@ims.com.
+
+The registration routes (`/register`) redirect to the login page with a message directing users to contact admin for account creation.
 
 ## Default User
 

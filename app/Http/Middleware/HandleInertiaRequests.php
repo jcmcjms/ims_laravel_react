@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
                     'permissions' => $user->getAllPermissions(),
                 ] : null,
             ],
+            'show_welcome' => $request->session()->get('show_welcome'),
         ]);
     }
 }

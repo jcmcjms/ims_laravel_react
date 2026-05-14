@@ -1,7 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { useEffect, useRef } from 'react';
 import { type BreadcrumbItem } from '@/types';
 
 interface Product {
@@ -124,6 +126,18 @@ export default function Dashboard({
     topCategories,
     lowStockAlerts,
 }: DashboardProps) {
+    const props = usePage().props as { show_welcome?: boolean; auth?: { user?: { name?: string } } };
+    const toastShown = useRef(false);
+
+    useEffect(() => {
+        if (props.show_welcome && props.auth?.user?.name && !toastShown.current) {
+            const firstName = props.auth.user.name.split(' ')[0];
+            toast.success(`Welcome, ${firstName}!`, {
+                description: 'You are now logged in.',
+            });
+            toastShown.current = true;
+        }
+    }, [props.show_welcome, props.auth?.user?.name]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

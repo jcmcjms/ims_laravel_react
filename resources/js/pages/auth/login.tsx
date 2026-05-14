@@ -141,22 +141,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     )}
                 </Button>
 
-                {/* Divider */}
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-border" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-3 text-muted-foreground">New to IMS?</span>
-                    </div>
-                </div>
-
-                {/* Sign up link */}
-                <div className="text-center text-sm">
-                    <span className="text-muted-foreground">Don't have an account? </span>
-                    <TextLink href={route('register')} tabIndex={5} className="font-medium">
-                        Create an account
-                    </TextLink>
+                {/* Contact admin info */}
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-center text-sm text-blue-700 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-400">
+                    <span className="font-medium">Need an account?</span> Contact admin@ims.com to request access.
                 </div>
             </form>
         </AuthLayout>
