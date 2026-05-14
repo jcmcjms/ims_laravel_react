@@ -62,13 +62,13 @@ export default function ProductsIndex({ products, categories, filters }) {
                                 />
                                 <Select
                                     name="category_id"
-                                    defaultValue={filters.category_id || ''}
+                                    defaultValue={filters.category_id || 'none'}
                                 >
                                     <SelectTrigger className="w-48">
                                         <SelectValue placeholder="All Categories" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All Categories</SelectItem>
+                                        <SelectItem value="none">All Categories</SelectItem>
                                         {categories.map((category) => (
                                             <SelectItem
                                                 key={category.id}

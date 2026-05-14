@@ -45,13 +45,13 @@ export default function LowStock({ inventories, warehouses, filters }) {
                             <form method="get" className="flex flex-wrap gap-2">
                                 <Select
                                     name="warehouse_id"
-                                    defaultValue={filters.warehouse_id || ''}
+                                    defaultValue={filters.warehouse_id || 'none'}
                                 >
                                     <SelectTrigger className="w-48">
                                         <SelectValue placeholder="All Warehouses" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All Warehouses</SelectItem>
+                                        <SelectItem value="none">All Warehouses</SelectItem>
                                         {warehouses.map((warehouse) => (
                                             <SelectItem
                                                 key={warehouse.id}

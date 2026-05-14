@@ -125,12 +125,12 @@ export default function CategoriesEdit({ category, categories }: CategoriesEditP
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="parent_id">Parent Category</Label>
-                                    <Select value={data.parent_id} onValueChange={(value) => setData('parent_id', value)}>
+                                    <Select value={data.parent_id || 'none'} onValueChange={(value) => setData('parent_id', value === 'none' ? '' : value)}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select a parent category (optional)" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="">None</SelectItem>
+                                            <SelectItem value="none">None</SelectItem>
                                             {categories.map((cat) => (
                                                 <SelectItem key={cat.id} value={cat.id.toString()}>
                                                     {cat.name}

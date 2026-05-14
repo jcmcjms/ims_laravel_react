@@ -83,13 +83,13 @@ export default function PurchaseOrdersIndex({ orders, filters }) {
                             <form method="get" className="flex gap-2">
                                 <Select
                                     name="status"
-                                    defaultValue={filters.status || ''}
+                                    defaultValue={filters.status || 'none'}
                                 >
                                     <SelectTrigger className="w-40">
                                         <SelectValue placeholder="All Statuses" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All Statuses</SelectItem>
+                                        <SelectItem value="none">All Statuses</SelectItem>
                                         <SelectItem value="pending">Pending</SelectItem>
                                         <SelectItem value="ordered">Ordered</SelectItem>
                                         <SelectItem value="received">Received</SelectItem>

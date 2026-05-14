@@ -80,13 +80,13 @@ export default function StockMovements({ movements, products, warehouses, filter
                                 />
                                 <Select
                                     name="movement_type"
-                                    defaultValue={filters.movement_type || ''}
+                                    defaultValue={filters.movement_type || 'none'}
                                 >
                                     <SelectTrigger className="w-40">
                                         <SelectValue placeholder="All Types" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All Types</SelectItem>
+                                        <SelectItem value="none">All Types</SelectItem>
                                         <SelectItem value="purchase">Purchase</SelectItem>
                                         <SelectItem value="sale">Sale</SelectItem>
                                         <SelectItem value="adjustment">Adjustment</SelectItem>
@@ -95,13 +95,13 @@ export default function StockMovements({ movements, products, warehouses, filter
                                 </Select>
                                 <Select
                                     name="product_id"
-                                    defaultValue={filters.product_id || ''}
+                                    defaultValue={filters.product_id || 'none'}
                                 >
                                     <SelectTrigger className="w-48">
                                         <SelectValue placeholder="All Products" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All Products</SelectItem>
+                                        <SelectItem value="none">All Products</SelectItem>
                                         {products.map((product) => (
                                             <SelectItem
                                                 key={product.id}
