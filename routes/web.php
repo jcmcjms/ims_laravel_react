@@ -38,6 +38,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('warehouses', WarehouseController::class);
     Route::resource('inventory', InventoryController::class);
     Route::resource('purchase-orders', PurchaseOrderController::class);
+    Route::post('purchase-orders/{purchaseOrder}/receive', [PurchaseOrderController::class, 'receive'])
+        ->name('purchase-orders.receive');
     Route::resource('stock-movements', StockMovementController::class);
     Route::get('stock-movements/adjust', [StockMovementController::class, 'getAdjustForm'])->name('stock-movements.adjust');
     Route::post('stock-movements/adjust', [StockMovementController::class, 'adjust'])->name('stock-movements.adjust-store');

@@ -100,9 +100,58 @@ class PurchaseOrderController extends Controller
             'expected_delivery' => 'nullable|date',
             'status' => 'required|in:pending,ordered,received,cancelled',
             'notes' => 'nullable|string',
+            'items' => 'nullable|array',
+            'items.*.id' => 'nullable|exists:purchase_order_items,id',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*._destroy' => 'nullable|boolean',
         ]);
 
-        $purchaseOrder->update($validated);
+        $purchaseOrder->update([
+            'supplier_id' => $validated['supplier_id'],
+            'order_date' => $validated['order_date'],
+            'expected_delivery' => $validated['expected_delivery'] ?? null,
+            'status' => $validated['status'],
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
+        // Handle items if provided
+        if (isset($validated['items'])) {
+            $existingItemIds = $purchaseOrder->items()->pluck('id')->toArray();
+            $submittedItemIds = [];
+
+            foreach ($validated['items'] as $itemData) {
+                if (isset($itemData['_destroy']) && $itemData['_destroy']) {
+                    // Delete item if marked for destruction
+                    if (!empty($itemData['id'])) {
+                        PurchaseOrderItem::where('id', $itemData['id'])
+                            ->where('purchase_order_id', $purchaseOrder->id)
+                            ->delete();
+                    }
+                    continue;
+                }
+
+                $itemId = $itemData['id'] ?? null;
+                $submittedItemIds[] = $itemId;
+
+                $itemPayload = [
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                    'unit_price' => $itemData['unit_price'],
+                ];
+
+                if ($itemId && in_array($itemId, $existingItemIds)) {
+                    // Update existing item
+                    PurchaseOrderItem::where('id', $itemId)
+                        ->where('purchase_order_id', $purchaseOrder->id)
+                        ->update($itemPayload);
+                } else {
+                    // Create new item
+                    $purchaseOrder->items()->create($itemPayload);
+                }
+            }
+        }
 
         return redirect()->route('purchase-orders.index')->with('success', 'Purchase order updated successfully.');
     }
