@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roles', RoleController::class);
 
     // Permission Management Routes
-    Route::resource('permissions', PermissionController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('permissions', PermissionController::class)->only(['index', 'store', 'update', 'destroy', 'create', 'edit']);
 
     // Existing routes
     Route::resource('categories', CategoryController::class);

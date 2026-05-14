@@ -158,14 +158,14 @@ export default function UsersEdit({ user, roles }: UsersEditProps) {
                                     <div className="grid gap-2">
                                         <Label htmlFor="role_id">Role</Label>
                                         <Select
-                                            value={data.role_id}
-                                            onValueChange={(value) => setData('role_id', value)}
+                                            value={data.role_id || 'none'}
+                                            onValueChange={(value) => setData('role_id', value === 'none' ? '' : value)}
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select a role" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="">No Role</SelectItem>
+                                                <SelectItem value="none">No Role</SelectItem>
                                                 {roles.map((role) => (
                                                     <SelectItem key={role.id} value={role.id.toString()}>
                                                         {role.name}

@@ -23,6 +23,14 @@ class PermissionController extends Controller
     }
 
     /**
+     * Show the form for creating a new permission.
+     */
+    public function create()
+    {
+        return Inertia::render('Permissions/Create');
+    }
+
+    /**
      * Store a newly created permission in storage.
      */
     public function store(Request $request)
@@ -40,6 +48,18 @@ class PermissionController extends Controller
 
         return redirect()->route('permissions.index')
             ->with('success', 'Permission created successfully.');
+    }
+
+    /**
+     * Show the form for editing the specified permission.
+     */
+    public function edit(Permission $permission)
+    {
+        $permission->load('roles');
+
+        return Inertia::render('Permissions/Edit', [
+            'permission' => $permission,
+        ]);
     }
 
     /**
