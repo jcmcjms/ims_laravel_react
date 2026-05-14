@@ -74,8 +74,10 @@ class User extends Authenticatable
      */
     public function hasRole(string $role): bool
     {
-        if ($this->role) {
-            return $this->role->name === $role;
+        // Always reload role to get fresh data from database
+        $userRole = $this->role()->first();
+        if ($userRole) {
+            return $userRole->name === $role;
         }
         return false;
     }
@@ -93,13 +95,17 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permission): bool
     {
-        // Check direct permissions
-        if ($this->permissions()->where('name', $permission)->exists()) {
+        // Always reload role to get fresh permissions from database
+        // This ensures permission changes take effect immediately
+        $role = $this->role()->first();
+
+        // Check permissions through role first (most common case)
+        if ($role && $role->hasPermission($permission)) {
             return true;
         }
 
-        // Check permissions through role
-        if ($this->role && $this->role->hasPermission($permission)) {
+        // Check direct permissions
+        if ($this->permissions()->where('name', $permission)->exists()) {
             return true;
         }
 
@@ -146,5 +152,27 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');
+    }
+
+    /**
+     * Get all permission names as an array (from role and direct permissions).
+     */
+    public function getAllPermissions(): array
+    {
+        $permissions = [];
+
+        // Get permissions from role
+        $role = $this->role()->first();
+        if ($role) {
+            $rolePermissions = $role->permissions()->pluck('name')->toArray();
+            $permissions = array_merge($permissions, $rolePermissions);
+        }
+
+        // Get direct permissions
+        $directPermissions = $this->permissions()->pluck('name')->toArray();
+        $permissions = array_merge($permissions, $directPermissions);
+
+        // Return unique permissions
+        return array_unique($permissions);
     }
 }

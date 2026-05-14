@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 interface Role {
     id: number;
@@ -61,6 +62,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function RolesIndex({ roles, filters }: RolesIndexProps) {
     const { props } = usePage();
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
@@ -87,12 +89,14 @@ export default function RolesIndex({ roles, filters }: RolesIndexProps) {
                         <h1 className="text-3xl font-bold tracking-tight">Roles</h1>
                         <p className="text-muted-foreground">Manage user roles and permissions</p>
                     </div>
-                    <Button asChild>
-                        <Link href="/roles/create">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Role
-                        </Link>
-                    </Button>
+                    {canCreate(userPermissions, 'roles') && (
+                        <Button asChild>
+                            <Link href="/roles/create">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Role
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (

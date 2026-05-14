@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { canCreate, canEdit, canDelete } from '@/lib/permissions';
 
 interface User {
     id: number;
@@ -65,6 +66,7 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
     const { props } = usePage();
     const errors = props.errors as Record<string, string>;
     const flash = props.flash || {};
+    const userPermissions = props.auth?.user?.permissions || [] as string[];
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
@@ -91,12 +93,14 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
                         <h1 className="text-3xl font-bold tracking-tight">Users</h1>
                         <p className="text-muted-foreground">Manage user accounts and permissions</p>
                     </div>
-                    <Button asChild>
-                        <Link href="/users/create">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add User
-                        </Link>
-                    </Button>
+                    {canCreate(userPermissions, 'users') && (
+                        <Button asChild>
+                            <Link href="/users/create">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add User
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 {(flash.success || flash.error) && (
@@ -174,18 +178,22 @@ export default function UsersIndex({ users, filters }: UsersIndexProps) {
                                             <TableCell>{formatDate(user.created_at)}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <Button variant="outline" size="icon" asChild>
-                                                        <Link href={`/users/${user.id}/edit`}>
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Link>
-                                                    </Button>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        onClick={() => handleDeleteClick(user)}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    {canEdit(userPermissions, 'users') && (
+                                                        <Button variant="outline" size="icon" asChild>
+                                                            <Link href={`/users/${user.id}/edit`}>
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
+                                                        </Button>
+                                                    )}
+                                                    {canDelete(userPermissions, 'users') && (
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            onClick={() => handleDeleteClick(user)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                         </TableRow>
