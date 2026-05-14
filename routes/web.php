@@ -9,6 +9,9 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,6 +22,16 @@ Route::get('/', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // User Management Routes
+    Route::resource('users', UserManagementController::class);
+
+    // Role Management Routes
+    Route::resource('roles', RoleController::class);
+
+    // Permission Management Routes
+    Route::resource('permissions', PermissionController::class)->only(['index', 'store', 'update', 'destroy']);
+
+    // Existing routes
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
     Route::resource('suppliers', SupplierController::class);
