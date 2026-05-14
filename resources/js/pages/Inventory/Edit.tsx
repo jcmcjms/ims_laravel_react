@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-export default function InventoryEdit({ inventory, products, warehouses }) {
+export default function InventoryEdit({ inventory }) {
     const { props } = usePage();
     const userPermissions = props.auth?.user?.permissions || [];
 

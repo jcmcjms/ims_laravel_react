@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { canCreate, canEdit, canDelete, canView } from '@/lib/permissions';
+import { canCreate, canEdit, canView } from '@/lib/permissions';
 
 const statusColors = {
     pending: 'bg-yellow-500',

@@ -58,7 +58,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function CategoriesIndex({ categories }: CategoriesIndexProps) {
     const { props } = usePage();
-    const errors = props.errors as Record<string, string>;
     const flash = props.flash || {};
     const userPermissions = props.auth?.user?.permissions || [] as string[];
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

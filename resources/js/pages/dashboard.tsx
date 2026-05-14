@@ -6,17 +6,6 @@ import { toast } from 'sonner';
 import { useEffect, useRef } from 'react';
 import { type BreadcrumbItem } from '@/types';
 
-interface Product {
-    id: number;
-    name: string;
-    sku: string;
-}
-
-interface Warehouse {
-    id: number;
-    name: string;
-}
-
 interface RecentMovement {
     id: number;
     product_name: string;

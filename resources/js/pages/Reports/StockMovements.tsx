@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-export default function StockMovements({ movements, products, warehouses, filters }) {
+export default function StockMovements({ movements, products, filters }) {
     const getMovementTypeBadge = (type) => {
         const variants = {
             purchase: 'default',

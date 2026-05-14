@@ -53,7 +53,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function StockMovementsAdjust({ products, warehouses }: StockMovementsAdjustProps) {
     const { props } = usePage();
     const flash = props.flash || {};
-    const errors = props.errors as Record<string, string>;
 
     const { data, setData, post, errors: formErrors, processing } = useForm({
         product_id: '',

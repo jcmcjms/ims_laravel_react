@@ -1,9 +1,7 @@
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { ReactNode } from 'react';
 
-import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -76,7 +74,7 @@ function Pagination({ links }: { links: Array<{ label: string; url: string | nul
     );
 }
 
-export default function DataTable<T extends Record<string, any>>({
+export default function DataTable<T extends { [key: string]: unknown }>({
     title,
     description,
     data,

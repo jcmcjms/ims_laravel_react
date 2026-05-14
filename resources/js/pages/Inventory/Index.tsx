@@ -19,14 +19,6 @@ export default function InventoryIndex({ inventories, warehouses, lowStockCount,
     const flash = props.flash || {};
     const userPermissions = props.auth?.user?.permissions || [] as string[];
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
-    };
-
     return (
         <AppLayout
             breadcrumbs={[
