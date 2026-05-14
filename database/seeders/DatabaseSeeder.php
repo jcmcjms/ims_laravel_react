@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Assign all permissions to Admin role
-        $allPermissions = Permission::where('guard_name', 'web')->get();
+        $allPermissions = Permission::where('guard_name', 'web')->pluck('id')->toArray();
         $adminRole->syncPermissions($allPermissions);
 
         // Create or find the admin user and assign Admin role
