@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -14,22 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed permissions first
+        // Seed permissions first, then roles
         $this->call([
             PermissionSeeder::class,
+            RoleSeeder::class,
         ]);
 
-        // Create Admin role with all permissions
-        $adminRole = Role::firstOrCreate(
-            ['name' => 'Admin', 'guard_name' => 'web'],
-            ['description' => 'Full system access with all permissions']
-        );
-
-        // Assign all permissions to Admin role
-        $allPermissions = Permission::where('guard_name', 'web')->pluck('id')->toArray();
-        $adminRole->syncPermissions($allPermissions);
-
         // Create or find the admin user and assign Admin role
+        // Note: The Admin role is already created by RoleSeeder with all permissions
+        $adminRole = Role::where('name', 'Admin')->first();
+
         User::firstOrCreate(
             ['email' => 'admin@ims.com'],
             [
