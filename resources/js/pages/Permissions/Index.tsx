@@ -1,5 +1,5 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Plus, Pencil, Trash2, Key } from 'lucide-react';
 import { useState } from 'react';
 
@@ -29,6 +29,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Permission {
     id: number;
@@ -40,7 +42,13 @@ interface Permission {
 }
 
 interface PermissionsIndexProps {
-    permissions: Permission[];
+    permissions: {
+        data: Permission[];
+        links: Array<{ label: string; url: string | null; active: boolean }>;
+    };
+    filters: {
+        search: string | null;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,7 +58,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function PermissionsIndex({ permissions }: PermissionsIndexProps) {
+export default function PermissionsIndex({ permissions, filters }: PermissionsIndexProps) {
+    const { props } = usePage();
+    const flash = props.flash || {};
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [permissionToDelete, setPermissionToDelete] = useState<Permission | null>(null);
 
@@ -85,9 +95,36 @@ export default function PermissionsIndex({ permissions }: PermissionsIndexProps)
                     </Button>
                 </div>
 
+                {(flash.success || flash.error) && (
+                    <Alert variant={flash.error ? 'destructive' : 'default'}>
+                        <AlertDescription>
+                            {flash.success || flash.error}
+                        </AlertDescription>
+                    </Alert>
+                )}
+
                 <Card>
                     <CardHeader>
-                        <CardTitle>All Permissions</CardTitle>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <CardTitle>All Permissions</CardTitle>
+                            <form method="get" className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Search permissions..."
+                                    defaultValue={filters.search || ''}
+                                    className="w-64"
+                                />
+                                <Button type="submit" variant="secondary">
+                                    Search
+                                </Button>
+                                {filters.search && (
+                                    <Button variant="outline" asChild>
+                                        <Link href="/permissions">Clear</Link>
+                                    </Button>
+                                )}
+                            </form>
+                        </div>
                         <CardDescription>
                             A list of all permissions available in the system
                         </CardDescription>
@@ -105,14 +142,14 @@ export default function PermissionsIndex({ permissions }: PermissionsIndexProps)
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {permissions.length === 0 ? (
+                                {permissions.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                            No permissions found. Create your first permission to get started.
+                                            No permissions found.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    permissions.map((permission) => (
+                                    permissions.data.map((permission) => (
                                         <TableRow key={permission.id}>
                                             <TableCell className="font-medium">
                                                 <div className="flex items-center gap-2">
@@ -158,6 +195,37 @@ export default function PermissionsIndex({ permissions }: PermissionsIndexProps)
                                 )}
                             </TableBody>
                         </Table>
+
+                        {/* Pagination */}
+                        {permissions.links && permissions.links.length > 3 && (
+                            <div className="flex justify-center mt-4">
+                                <div className="flex gap-1">
+                                    {permissions.links.map((link, index) => (
+                                        <Button
+                                            key={index}
+                                            asChild
+                                            variant={
+                                                link.active
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            size="sm"
+                                            disabled={!link.url}
+                                        >
+                                            {link.url ? (
+                                                <Link href={link.url}>
+                                                    {link.label
+                                                        .replace('&laquo;', '«')
+                                                        .replace('&raquo;', '»')}
+                                                </Link>
+                                            ) : (
+                                                <span>{link.label}</span>
+                                            )}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

@@ -1,5 +1,5 @@
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Plus, Pencil, Trash2, Shield } from 'lucide-react';
 import { useState } from 'react';
 
@@ -29,6 +29,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Role {
     id: number;
@@ -40,7 +42,13 @@ interface Role {
 }
 
 interface RolesIndexProps {
-    roles: Role[];
+    roles: {
+        data: Role[];
+        links: Array<{ label: string; url: string | null; active: boolean }>;
+    };
+    filters: {
+        search: string | null;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,7 +58,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function RolesIndex({ roles }: RolesIndexProps) {
+export default function RolesIndex({ roles, filters }: RolesIndexProps) {
+    const { props } = usePage();
+    const flash = props.flash || {};
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
@@ -85,9 +95,36 @@ export default function RolesIndex({ roles }: RolesIndexProps) {
                     </Button>
                 </div>
 
+                {(flash.success || flash.error) && (
+                    <Alert variant={flash.error ? 'destructive' : 'default'}>
+                        <AlertDescription>
+                            {flash.success || flash.error}
+                        </AlertDescription>
+                    </Alert>
+                )}
+
                 <Card>
                     <CardHeader>
-                        <CardTitle>All Roles</CardTitle>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <CardTitle>All Roles</CardTitle>
+                            <form method="get" className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Search roles..."
+                                    defaultValue={filters.search || ''}
+                                    className="w-64"
+                                />
+                                <Button type="submit" variant="secondary">
+                                    Search
+                                </Button>
+                                {filters.search && (
+                                    <Button variant="outline" asChild>
+                                        <Link href="/roles">Clear</Link>
+                                    </Button>
+                                )}
+                            </form>
+                        </div>
                         <CardDescription>
                             A list of all roles and their assigned permissions
                         </CardDescription>
@@ -105,14 +142,14 @@ export default function RolesIndex({ roles }: RolesIndexProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {roles.length === 0 ? (
+                                {roles.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                            No roles found. Create your first role to get started.
+                                            No roles found.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    roles.map((role) => (
+                                    roles.data.map((role) => (
                                         <TableRow key={role.id}>
                                             <TableCell className="font-medium">
                                                 <div className="flex items-center gap-2">
@@ -158,6 +195,37 @@ export default function RolesIndex({ roles }: RolesIndexProps) {
                                 )}
                             </TableBody>
                         </Table>
+
+                        {/* Pagination */}
+                        {roles.links && roles.links.length > 3 && (
+                            <div className="flex justify-center mt-4">
+                                <div className="flex gap-1">
+                                    {roles.links.map((link, index) => (
+                                        <Button
+                                            key={index}
+                                            asChild
+                                            variant={
+                                                link.active
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            size="sm"
+                                            disabled={!link.url}
+                                        >
+                                            {link.url ? (
+                                                <Link href={link.url}>
+                                                    {link.label
+                                                        .replace('&laquo;', '«')
+                                                        .replace('&raquo;', '»')}
+                                                </Link>
+                                            ) : (
+                                                <span>{link.label}</span>
+                                            )}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

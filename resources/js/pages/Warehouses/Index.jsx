@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
 
-export default function WarehousesIndex({ warehouses }) {
+export default function WarehousesIndex({ warehouses, filters }) {
     const { props } = usePage();
     const flash = props.flash || {};
 
@@ -22,7 +23,9 @@ export default function WarehousesIndex({ warehouses }) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Warehouses</h1>
-                        <p className="text-muted-foreground">Manage your warehouse locations</p>
+                        <p className="text-muted-foreground">
+                            Manage your warehouse locations
+                        </p>
                     </div>
                     <Button asChild>
                         <Link href={route('warehouses.create')}>Add Warehouse</Link>
@@ -39,12 +42,31 @@ export default function WarehousesIndex({ warehouses }) {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>All Warehouses</CardTitle>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <CardTitle>All Warehouses</CardTitle>
+                            <form method="get" className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Search warehouses..."
+                                    defaultValue={filters.search || ''}
+                                    className="w-64"
+                                />
+                                <Button type="submit" variant="secondary">
+                                    Search
+                                </Button>
+                                {filters.search && (
+                                    <Button variant="outline" asChild>
+                                        <Link href="/warehouses">Clear</Link>
+                                    </Button>
+                                )}
+                            </form>
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        {warehouses.length === 0 ? (
+                        {warehouses.data.length === 0 ? (
                             <div className="py-8 text-center text-muted-foreground">
-                                No warehouses found. Create your first warehouse to get started.
+                                No warehouses found.
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -58,7 +80,7 @@ export default function WarehousesIndex({ warehouses }) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {warehouses.map((warehouse) => (
+                                        {warehouses.data.map((warehouse) => (
                                             <tr key={warehouse.id} className="border-b last:border-0">
                                                 <td className="py-4">
                                                     <div className="flex items-center gap-3">
@@ -108,6 +130,37 @@ export default function WarehousesIndex({ warehouses }) {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        )}
+
+                        {/* Pagination */}
+                        {warehouses.links && warehouses.links.length > 3 && (
+                            <div className="flex justify-center mt-4">
+                                <div className="flex gap-1">
+                                    {warehouses.links.map((link, index) => (
+                                        <Button
+                                            key={index}
+                                            asChild
+                                            variant={
+                                                link.active
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            size="sm"
+                                            disabled={!link.url}
+                                        >
+                                            {link.url ? (
+                                                <Link href={link.url}>
+                                                    {link.label
+                                                        .replace('&laquo;', '«')
+                                                        .replace('&raquo;', '»')}
+                                                </Link>
+                                            ) : (
+                                                <span>{link.label}</span>
+                                            )}
+                                        </Button>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </CardContent>
