@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -63,10 +64,9 @@ class User extends Authenticatable
     /**
      * Get the permissions that belong to the user through roles.
      */
-    public function permissions(): BelongsToMany
+    public function permissions(): MorphToMany
     {
-        return $this->belongsToMany(Permission::class, 'model_has_permissions')
-            ->withTimestamps();
+        return $this->morphToMany(Permission::class, 'model', 'model_has_permissions');
     }
 
     /**
@@ -174,5 +174,16 @@ class User extends Authenticatable
 
         // Return unique permissions
         return array_unique($permissions);
+    }
+
+    /**
+     * Get the avatar URL attribute.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if ($this->avatar) {
+            return '/storage/avatars/' . $this->avatar;
+        }
+        return null;
     }
 }
