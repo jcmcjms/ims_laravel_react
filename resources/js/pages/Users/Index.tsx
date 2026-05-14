@@ -29,6 +29,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface User {
     id: number;
@@ -43,7 +45,13 @@ interface User {
 }
 
 interface UsersIndexProps {
-    users: User[];
+    users: {
+        data: User[];
+        links: Array<{ label: string; url: string | null; active: boolean }>;
+    };
+    filters: {
+        search: string | null;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -53,9 +61,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function UsersIndex({ users }: UsersIndexProps) {
+export default function UsersIndex({ users, filters }: UsersIndexProps) {
     const { props } = usePage();
     const errors = props.errors as Record<string, string>;
+    const flash = props.flash || {};
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
@@ -90,9 +99,36 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                     </Button>
                 </div>
 
+                {(flash.success || flash.error) && (
+                    <Alert variant={flash.error ? 'destructive' : 'default'}>
+                        <AlertDescription>
+                            {flash.success || flash.error}
+                        </AlertDescription>
+                    </Alert>
+                )}
+
                 <Card>
                     <CardHeader>
-                        <CardTitle>All Users</CardTitle>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <CardTitle>All Users</CardTitle>
+                            <form method="get" className="flex gap-2">
+                                <Input
+                                    type="text"
+                                    name="search"
+                                    placeholder="Search by name or email..."
+                                    defaultValue={filters.search || ''}
+                                    className="w-64"
+                                />
+                                <Button type="submit" variant="secondary">
+                                    Search
+                                </Button>
+                                {filters.search && (
+                                    <Button variant="outline" asChild>
+                                        <Link href="/users">Clear</Link>
+                                    </Button>
+                                )}
+                            </form>
+                        </div>
                         <CardDescription>
                             A list of all users in the system
                         </CardDescription>
@@ -110,14 +146,14 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {users.length === 0 ? (
+                                {users.data.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                            No users found. Create your first user to get started.
+                                            No users found.
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    users.map((user) => (
+                                    users.data.map((user) => (
                                         <TableRow key={user.id}>
                                             <TableCell className="font-medium">{user.name}</TableCell>
                                             <TableCell>{user.email}</TableCell>
@@ -157,6 +193,37 @@ export default function UsersIndex({ users }: UsersIndexProps) {
                                 )}
                             </TableBody>
                         </Table>
+
+                        {/* Pagination */}
+                        {users.links && users.links.length > 3 && (
+                            <div className="flex justify-center mt-4">
+                                <div className="flex gap-1">
+                                    {users.links.map((link, index) => (
+                                        <Button
+                                            key={index}
+                                            asChild
+                                            variant={
+                                                link.active
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            size="sm"
+                                            disabled={!link.url}
+                                        >
+                                            {link.url ? (
+                                                <Link href={link.url}>
+                                                    {link.label
+                                                        .replace('&laquo;', '«')
+                                                        .replace('&raquo;', '»')}
+                                                </Link>
+                                            ) : (
+                                                <span>{link.label}</span>
+                                            )}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

@@ -11,14 +11,26 @@ class WarehouseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+
         $warehouses = Warehouse::withCount('inventory')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('location', 'like', '%' . $search . '%');
+                });
+            })
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Warehouses/Index', [
             'warehouses' => $warehouses,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

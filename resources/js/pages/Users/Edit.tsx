@@ -213,7 +213,7 @@ export default function UsersEdit({ user, roles }: UsersEditProps) {
                                     <InputError message={errors.is_active} />
                                 </div>
 
-                                <div className="flex items-center gap-4">
+<div className="flex items-center gap-4">
                                     <Button type="submit" disabled={processing}>
                                         {processing ? 'Updating...' : 'Update User'}
                                     </Button>

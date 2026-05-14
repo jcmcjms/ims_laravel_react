@@ -13,14 +13,26 @@ class UserManagementController extends Controller
     /**
      * Display a listing of the users.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+
         $users = User::with('role')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            })
             ->orderBy('name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Users/Index', [
             'users' => $users,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
 

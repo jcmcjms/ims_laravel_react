@@ -22,6 +22,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/hooks/use-toast';
 
 interface Role {
     id: number;
@@ -60,10 +61,23 @@ export default function UsersCreate({ roles }: UsersCreateProps) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('users.store'), {
-            onFinish: () => {
+            onSuccess: () => {
+                toast.success({
+                    title: 'User created',
+                    description: 'The user has been created successfully.',
+                });
                 // Reset password fields after submission
                 setData('password', '');
                 setData('password_confirmation', '');
+            },
+            onError: (errors) => {
+                toast.error({
+                    title: 'Failed to create user',
+                    description: Object.values(errors).flat().join(', ') || 'An error occurred.',
+                });
+            },
+            onFinish: () => {
+                // Additional cleanup if needed
             },
         });
     };
