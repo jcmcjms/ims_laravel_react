@@ -22,7 +22,7 @@ import {
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface Permission {
     id: number;
@@ -90,14 +90,12 @@ export default function RolesCreate({ permissions }: RolesCreateProps) {
         e.preventDefault();
         post(route('roles.store'), {
             onSuccess: () => {
-                toast.success({
-                    title: 'Role created',
+                toast.success('Role created', {
                     description: 'The role has been created successfully.',
                 });
             },
             onError: (errors) => {
-                toast.error({
-                    title: 'Failed to create role',
+                toast.error('Failed to create role', {
                     description: Object.values(errors).flat().join(', ') || 'An error occurred.',
                 });
             },

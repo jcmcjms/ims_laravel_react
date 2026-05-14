@@ -4,8 +4,8 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { route as routeFn } from 'ziggy-js';
+import { Toaster } from 'sonner';
 import { initializeTheme } from './hooks/use-appearance';
-import { Toaster } from './components/ui/toaster';
 
 declare global {
     const route: typeof routeFn;
@@ -22,7 +22,7 @@ createInertiaApp({
         root.render(
             <>
                 <App {...props} />
-                <Toaster />
+                <Toaster position="top-right" richColors closeButton />
             </>
         );
     },

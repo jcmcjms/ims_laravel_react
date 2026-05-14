@@ -22,7 +22,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface Role {
     id: number;
@@ -62,8 +62,7 @@ export default function UsersCreate({ roles }: UsersCreateProps) {
         e.preventDefault();
         post(route('users.store'), {
             onSuccess: () => {
-                toast.success({
-                    title: 'User created',
+                toast.success('User created', {
                     description: 'The user has been created successfully.',
                 });
                 // Reset password fields after submission
@@ -71,8 +70,7 @@ export default function UsersCreate({ roles }: UsersCreateProps) {
                 setData('password_confirmation', '');
             },
             onError: (errors) => {
-                toast.error({
-                    title: 'Failed to create user',
+                toast.error('Failed to create user', {
                     description: Object.values(errors).flat().join(', ') || 'An error occurred.',
                 });
             },
